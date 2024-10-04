@@ -12,6 +12,14 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final todosList = ToDo.todoList();
+  List<ToDo> _foundToDo = [];
+  final _todoController = TextEditingController();
+
+  @override
+  void initState() {
+    _foundToDo = todosList;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +41,7 @@ class _HomeState extends State<Home> {
                     children: [
                       Container(
                         margin: EdgeInsets.only(
-                          top: 50,
+                          top: 30,
                           bottom: 20,
                         ),
                         child: Text(
@@ -44,7 +52,7 @@ class _HomeState extends State<Home> {
                           ),
                         ),
                       ),
-                      for (ToDo todo in todosList)
+                      for (ToDo todo in _foundToDo.reversed)
                         ToDoItem(
                           todo: todo,
                           onToDoChanged: _handleToDoChange,
@@ -73,7 +81,7 @@ class _HomeState extends State<Home> {
                     ),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      boxShadow: [
+                      boxShadow: const [
                         BoxShadow(
                           color: Colors.grey,
                           offset: Offset(0.0, 0.0),
@@ -84,9 +92,11 @@ class _HomeState extends State<Home> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: TextField(
+                      controller: _todoController,
                       decoration: InputDecoration(
-                          hintText: 'Add a new todo item',
-                          border: InputBorder.none),
+                        hintText: 'Add a new todo item',
+                        border: InputBorder.none,
+                      ),
                     ),
                   ),
                 ),
@@ -96,7 +106,9 @@ class _HomeState extends State<Home> {
                     bottom: 20,
                   ),
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      _addTodoItem(_todoController.text);
+                    },
                     child: Text(
                       '+',
                       style: TextStyle(
@@ -113,7 +125,7 @@ class _HomeState extends State<Home> {
                       ),
                     ),
                   ),
-                )
+                ),
               ],
             ),
           ),
@@ -134,15 +146,44 @@ class _HomeState extends State<Home> {
     });
   }
 
+  void _addTodoItem(String toDo) {
+    setState(() {
+      todosList.add(
+        ToDo(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          todoText: toDo,
+        ),
+      );
+    });
+    _todoController.clear();
+  }
+
+  void _runFilter(String enteredKeyword) {
+    List<ToDo> results = [];
+    if (enteredKeyword.isEmpty) {
+      results = todosList;
+    } else {
+      results = todosList
+          .where((item) => item.todoText!
+              .toLowerCase()
+              .contains(enteredKeyword.toLowerCase()))
+          .toList();
+    }
+    setState(() {
+      _foundToDo = results;
+    });
+  }
+
   Widget SearchBox() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(25),
+          borderRadius: BorderRadius.circular(20),
         ),
         child: TextField(
+          onChanged: (value) => _runFilter(value),
           decoration: InputDecoration(
             contentPadding: EdgeInsets.all(0),
             prefixIcon: Padding(
@@ -168,7 +209,6 @@ class _HomeState extends State<Home> {
     );
   }
 
-  @override
   AppBar _buildAppBar() {
     return AppBar(
       backgroundColor: tdBGColor,
@@ -182,10 +222,10 @@ class _HomeState extends State<Home> {
             size: 30,
           ),
           Container(
-            height: 50,
-            width: 50,
+            height: 40,
+            width: 40,
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(80),
+              borderRadius: BorderRadius.circular(10),
               child: Image.asset('asset/image/one_piece.jpg'),
             ),
           ),
