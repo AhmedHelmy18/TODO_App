@@ -150,7 +150,10 @@ class _HomeState extends State<Home> {
     setState(() {
       todosList.add(
         ToDo(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          id: DateTime
+              .now()
+              .millisecondsSinceEpoch
+              .toString(),
           todoText: toDo,
         ),
       );
@@ -164,7 +167,8 @@ class _HomeState extends State<Home> {
       results = todosList;
     } else {
       results = todosList
-          .where((item) => item.todoText!
+          .where((item) =>
+          item.todoText!
               .toLowerCase()
               .contains(enteredKeyword.toLowerCase()))
           .toList();
