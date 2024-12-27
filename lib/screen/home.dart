@@ -1,7 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:todo_app/constants/colors.dart';
-import '../models/todo.dart';
-import '../widget/todo_item.dart';
+import 'package:todo_app/models/todo.dart';
+import 'package:todo_app/widget/todo_item.dart';
 
 class Home extends StatefulWidget {
   Home({super.key});
@@ -11,14 +12,37 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  final todosList = ToDo.todoList();
+  List<ToDo> todosList = [];
   List<ToDo> _foundToDo = [];
   final _todoController = TextEditingController();
 
   @override
   void initState() {
-    _foundToDo = todosList;
     super.initState();
+    readItems();
+  }
+
+  void readItems() async {
+    var items = await FirebaseFirestore.instance.collection("items").get();
+
+    for (var item in items.docs) {
+      setState(
+        () {
+          todosList.add(
+            ToDo(
+              id: item.id,
+              todoText: item.get("text"),
+              isDone: item.get("done"),
+            ),
+          );
+        },
+      );
+    }
+    setState(
+      () {
+        _foundToDo = todosList;
+      },
+    );
   }
 
   @override
@@ -116,6 +140,7 @@ class _HomeState extends State<Home> {
                         color: Colors.white,
                       ),
                     ),
+
                     style: ElevatedButton.styleFrom(
                       backgroundColor: tdBlue,
                       minimumSize: Size(60, 60),
@@ -135,25 +160,32 @@ class _HomeState extends State<Home> {
   }
 
   void _handleToDoChange(ToDo todo) {
+    FirebaseFirestore.instance
+        .collection("items")
+        .doc(todo.id)
+        .update({"done": !todo.isDone});
     setState(() {
       todo.isDone = !todo.isDone;
     });
   }
 
   void _deleteToDoItem(String id) {
+    FirebaseFirestore.instance.collection("items").doc(id).delete();
     setState(() {
       todosList.removeWhere((item) => item.id == id);
     });
   }
 
   void _addTodoItem(String toDo) {
+    final id = DateTime.now().millisecondsSinceEpoch.toString();
+    FirebaseFirestore.instance
+        .collection("items")
+        .doc(id)
+        .set({"text": toDo, "done": false});
     setState(() {
       todosList.add(
         ToDo(
-          id: DateTime
-              .now()
-              .millisecondsSinceEpoch
-              .toString(),
+          id: id,
           todoText: toDo,
         ),
       );
