@@ -50,7 +50,7 @@ class ToDoItem extends StatelessWidget {
           ),
           child: IconButton(
             onPressed: () {
-              onDeleteItem(todo.id);
+              onDeleteItem(todo);
             },
             icon: Icon(
               Icons.delete,

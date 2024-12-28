@@ -25,16 +25,16 @@ class _HomeState extends State<Home> {
   }
 
   void readItems() async {
-    var items = await FirebaseFirestore.instance.collection("items").get();
+    var doc = await FirebaseFirestore.instance.collection("users").doc(FirebaseAuth.instance.currentUser?.uid).get();
 
-    for (var item in items.docs) {
+    for (var item in doc.get("items")) {
       setState(
         () {
           todosList.add(
             ToDo(
-              id: item.id,
-              todoText: item.get("text"),
-              isDone: item.get("done"),
+              id: item["id"],
+              todoText: item["text"],
+              isDone: item["done"]
             ),
           );
         },
@@ -222,28 +222,49 @@ class _HomeState extends State<Home> {
   }
 
   void _handleToDoChange(ToDo todo) {
-    FirebaseFirestore.instance
-        .collection("items")
-        .doc(todo.id)
-        .update({"done": !todo.isDone});
     setState(() {
       todo.isDone = !todo.isDone;
     });
+
+    List<Map> updatedList = [];
+
+    for(var item in todosList) {
+      updatedList.add({"id": item.id, "text": item.todoText, "done": item.isDone});
+    }
+
+    FirebaseFirestore.instance.collection("users").doc(
+        FirebaseAuth.instance.currentUser?.uid).update({
+      "items": updatedList
+    });
   }
 
-  void _deleteToDoItem(String id) {
-    FirebaseFirestore.instance.collection("items").doc(id).delete();
+  void _deleteToDoItem(ToDo todo) {
+
     setState(() {
-      todosList.removeWhere((item) => item.id == id);
+      todosList.removeWhere((item) => item.id == todo.id);
+    });
+    FirebaseFirestore.instance.collection("users").doc(
+        FirebaseAuth.instance.currentUser?.uid).update({
+      "items": FieldValue.arrayRemove([
+        {"id": todo.id, "text": todo.todoText, "done": todo.isDone}
+      ])
     });
   }
 
   void _addTodoItem(String toDo) {
     final id = DateTime.now().millisecondsSinceEpoch.toString();
     FirebaseFirestore.instance
-        .collection("items")
-        .doc(id)
-        .set({"text": toDo, "done": false});
+        .collection("users")
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .update(
+      {
+        "items": FieldValue.arrayUnion(
+          [
+            {"id": id, "text": toDo, "done": false}
+          ],
+        )
+      },
+    );
     setState(() {
       todosList.add(
         ToDo(
