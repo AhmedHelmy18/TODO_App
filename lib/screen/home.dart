@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:todo_app/authentication/auth_page/login_page.dart';
 import 'package:todo_app/constants/colors.dart';
 import 'package:todo_app/models/todo.dart';
 import 'package:todo_app/widget/todo_item.dart';
@@ -49,7 +51,68 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: tdBGColor,
-      appBar: AppBar(),
+      appBar: AppBar(
+        backgroundColor: tdBGColor,
+      ),
+      drawer: Drawer(
+        width: 250,
+        child: Container(
+          color: tdBGColor,
+          child: ListView(
+            children: [
+              DrawerHeader(
+                child: UserAccountsDrawerHeader(
+                  decoration: BoxDecoration(color: tdBGColor),
+                  accountName: Text(
+                    FirebaseAuth.instance.currentUser!.displayName.toString(),
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontFamily: 'PlayfairDisplay',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
+                  ),
+                  accountEmail: Text(
+                    FirebaseAuth.instance.currentUser!.email.toString(),
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontFamily: 'PlayfairDisplay',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                ),
+              ),
+              ListTile(
+                leading: IconButton(
+                  onPressed: () async {
+                    await FirebaseAuth.instance.signOut();
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => LoginPage(),
+                      ),
+                    );
+                  },
+                  icon: Icon(
+                    Icons.logout,
+                    color: const Color.fromARGB(255, 10, 10, 10),
+                  ),
+                ),
+                title: Text(
+                  'Logout',
+                  style: TextStyle(
+                    fontFamily: 'PlayfairDisplay',
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                    fontSize: 20,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
       body: Stack(
         children: [
           Container(
@@ -242,6 +305,4 @@ class _HomeState extends State<Home> {
       ),
     );
   }
-
-  
 }
