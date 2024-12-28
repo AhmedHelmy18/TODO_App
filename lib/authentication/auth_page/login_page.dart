@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:todo_app/authentication/auth_form/login_form.dart';
+import 'package:todo_app/authentication/auth_page/forget_password.dart';
+import 'package:todo_app/authentication/auth_page/sign_up_page.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -60,12 +67,19 @@ class LoginPage extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SignUpPage(),
+                          ),
+                        );
+                      },
                       child: Text(
                         'Sign Up',
                         style: TextStyle(
                           color: Colors.white,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w500,
                           fontSize: 20,
                           fontFamily: 'PlayfairDisplay',
                         ),
@@ -74,15 +88,19 @@ class LoginPage extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(
-                height: 20,
-              ),
               Padding(
                 padding: const EdgeInsets.only(left: 25.0),
                 child: Align(
                   alignment: Alignment.bottomLeft,
                   child: GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ForgetPassword(),
+                        ),
+                      );
+                    },
                     child: Text(
                       'Forget Password?',
                       textAlign: TextAlign.left,

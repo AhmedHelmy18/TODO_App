@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:todo_app/authentication/auth_form/sign_up_form.dart';
+import 'package:todo_app/authentication/auth_page/login_page.dart';
 
 class SignUpPage extends StatelessWidget {
   const SignUpPage({super.key});
@@ -59,12 +60,19 @@ class SignUpPage extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => LoginPage(),
+                        ),
+                      );
+                    },
                     child: Text(
                       'Login',
                       style: TextStyle(
                         color: Colors.white,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w700,
                         fontSize: 20,
                         fontFamily: 'PlayfairDisplay',
                       ),

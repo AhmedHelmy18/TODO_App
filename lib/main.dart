@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:todo_app/authentication/auth_page/forget_password.dart';
 import 'package:todo_app/authentication/auth_page/login_page.dart';
 // import 'package:todo_app/authentication/auth_page/sign_up_page.dart';
 // import 'package:todo_app/screen/home.dart';
@@ -23,7 +24,7 @@ class TODO_App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: LoginPage(),
+      home: ForgetPassword(),
     );
   }
 }

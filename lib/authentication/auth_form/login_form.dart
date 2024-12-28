@@ -1,11 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:todo_app/input_field/custom_text_form_field.dart';
 import 'package:todo_app/mics/error_box.dart';
+import 'package:todo_app/screen/home.dart';
 
 class LoginForm extends StatefulWidget {
-  const LoginForm({super.key, this.setLoginState});
-
-  final dynamic setLoginState;
+  const LoginForm({super.key});
 
   @override
   State<LoginForm> createState() => _LoginFormState();
@@ -82,10 +82,27 @@ class _LoginFormState extends State<LoginForm> {
               minimumSize: const Size(300, 40),
               backgroundColor: Colors.blue,
             ),
-            onPressed: () {
+            onPressed: () async {
               if (_formKey.currentState!.validate()) {
                 _formKey.currentState!.save();
-                widget.setLoginState(email, password);
+                try {
+                  // ignore: unused_local_variable
+                  final credential = await FirebaseAuth.instance
+                      .signInWithEmailAndPassword(
+                          email: email, password: password);
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Home(),
+                    ),
+                  );
+                } on FirebaseAuthException catch (e) {
+                  if (e.code == 'user-not-found') {
+                    error = 'No user found for that email.';
+                  } else if (e.code == 'wrong-password') {
+                    error = 'Wrong password provided for that user.';
+                  }
+                }
               } else {
                 setState(
                   () {
@@ -98,7 +115,7 @@ class _LoginFormState extends State<LoginForm> {
               'Login',
               style: TextStyle(
                 fontSize: 25,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w500,
                 fontFamily: 'PlayfairDisplay',
                 color: Colors.white,
               ),

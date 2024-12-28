@@ -1,7 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:todo_app/input_field/custom_text_form_field.dart';
 import 'package:todo_app/mics/error_box.dart';
+import 'package:todo_app/screen/home.dart';
 
 class SignUpForm extends StatefulWidget {
   const SignUpForm({
@@ -125,7 +127,40 @@ class _SignUpFormState extends State<SignUpForm> {
             height: 13,
           ),
           ElevatedButton(
-            onPressed: () {},
+            onPressed: () async {
+              if (_formKey.currentState!.validate()) {
+                _formKey.currentState!.save();
+                autoValidateMode = AutovalidateMode.disabled;
+                try {
+                  final credential = await FirebaseAuth.instance
+                      .createUserWithEmailAndPassword(
+                    email: email,
+                    password: password,
+                  );
+                  await FirebaseAuth.instance.currentUser
+                      ?.sendEmailVerification();
+
+                  await credential.user?.updateDisplayName(name);
+
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Home(),
+                    ),
+                  );
+                } on FirebaseAuthException catch (e) {
+                  if (e.code == 'weak-password') {
+                    error = 'The password provided is too weak.';
+                  } else if (e.code == 'email-already-in-use') {
+                    error = 'The account already exists for that email.';
+                  }
+                } catch (e) {
+                  error = e.toString();
+                }
+              } else {
+                autoValidateMode = AutovalidateMode.onUserInteraction;
+              }
+            },
             style: ElevatedButton.styleFrom(
               minimumSize: const Size(300, 40),
               backgroundColor: Colors.blue,
@@ -134,7 +169,7 @@ class _SignUpFormState extends State<SignUpForm> {
               'Sign Up',
               style: TextStyle(
                 fontSize: 25,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w500,
                 fontFamily: 'PlayfairDisplay',
                 color: Colors.white,
               ),
