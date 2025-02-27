@@ -52,7 +52,7 @@ class _LoginFormState extends State<LoginForm> {
             },
           ),
           const SizedBox(
-            height: 13,
+            height: 20,
           ),
           CustomTextFormField(
             onChange: (value) {
@@ -75,7 +75,7 @@ class _LoginFormState extends State<LoginForm> {
             },
           ),
           const SizedBox(
-            height: 20,
+            height: 25,
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
